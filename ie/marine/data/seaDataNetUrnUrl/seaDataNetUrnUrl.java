@@ -2,10 +2,6 @@ package ie.marine.data.seaDataNetUrnUrl;
 /**
  * This class resolves a SeaDataNet URN to a URL
  * 
- * The class can be used in the following way:
- * {@code		seaDataNetUrnUrl sdnu = new seaDataNetUrnUrl();}
- * {@code		String url = sdnu.getUrlFromUrn("SDN:EDMO::575");}
- * 
  * @author 	Adam Leadbetter
  * @version 0.1
  * @since 	0.1
@@ -56,6 +52,9 @@ public final class seaDataNetUrnUrl implements sdnUrnResolver{
 		}
 	}
 
+	private static String edmedQueryBuilder() {
+		return "";
+	}
 /**
  * Select the SeaDataNet catalogue and build the URN from the URL
  * 	
@@ -65,17 +64,22 @@ public final class seaDataNetUrnUrl implements sdnUrnResolver{
 	private static String chooseCatalogue(String catalogue) {
 		switch(sdn.valueOf(catalogue)) {
 			case EDMED:
-				System.out.println(baseUrls.EDMED.getUrl());
-				break;
+				return baseUrls.EDMED.getUrl() 
+						+ queries.BASEQUERY.getQuery()
+						+ edmedQueryBuilder()
+						+ "&" + queries.OUTPUT.getQuery();
 			case CSR:
-				System.out.println(baseUrls.CSR.getUrl());
-				break;
+				return baseUrls.CSR.getUrl() 
+						+ queries.BASEQUERY.getQuery()
+						+ "&" + queries.OUTPUT.getQuery();
 			case EDMO:
-				System.out.println(baseUrls.EDMO.getUrl());
-				break;
+				return baseUrls.EDMO.getUrl() 
+						+ queries.BASEQUERY.getQuery()
+						+ "&" + queries.OUTPUT.getQuery();
 			case EDMERP:
-				System.out.println(baseUrls.EDMERP.getUrl());
-				break;
+				return baseUrls.EDMERP.getUrl() 
+						+ queries.BASEQUERY.getQuery()
+						+ "&" + queries.OUTPUT.getQuery();
 			default:
 				break;
 		}
@@ -92,8 +96,9 @@ public final class seaDataNetUrnUrl implements sdnUrnResolver{
 	public String getUrlFromUrn(String urn) {
 		String[] splitUrn = urn.split(":");
 		if(checkUrnPrefix(splitUrn[0])) {
-			chooseCatalogue(splitUrn[1]);
+			return chooseCatalogue(splitUrn[1]);
+		} else {
+			return "";
 		}
-		return "";
 	}
 }

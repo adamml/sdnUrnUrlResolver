@@ -4,13 +4,6 @@
 
 This class resolves a SeaDataNet URN to a URL
 
-The class can be used in the following way: 
-
-```java
-seaDataNetUrnUrl sdnu = new seaDataNetUrnUrl();
-String url = sdnu.getUrlFromUrn("SDN:EDMO::575");
-```
-
  * **Author:** Adam Leadbetter
  * **Version:** 0.1
  * **Since:** 0.1

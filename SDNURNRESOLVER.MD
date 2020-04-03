@@ -7,23 +7,23 @@ Defines the SeaDataNet URN prefix and the catalogue names
  * **Author:** Adam Leadbetter
  * **Since:** 0.1
 
-## `SDN,`
+## `SDN`
 
 SeaDataNet URN prefix
 
-## `CSR,`
+## `CSR`
 
 Cruise Summary Report catalogue name
 
-## `EDMED,`
+## `EDMED`
 
 European Directory of Marine Environmental Datasets catalogue name
 
-## `EDMO,`
+## `EDMO`
 
 European Directory of Marine Organisations catalogue name
 
-## `EDMERP  }`
+## `EDMERP`
 
 European Directory of Marine Research Projects catalogue name
 
