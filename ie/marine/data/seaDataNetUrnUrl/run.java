@@ -1,8 +1,8 @@
-package seaDataNetUrnUrl;
+package ie.marine.data.seaDataNetUrnUrl;
 
 public class run {
 	public static void main(String[] args) {
 		seaDataNetUrnUrl sdnu = new seaDataNetUrnUrl();
-		sdnu.getUrlFromUrn("SDN:P01");
+		sdnu.getUrlFromUrn("SDN:EDMED");
 	}
 }
