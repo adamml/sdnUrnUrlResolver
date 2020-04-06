@@ -1,6 +1,8 @@
 # sdnUrnUrlResolver
 A Java implementation of the URN to URL resolver for SeaDataNet
 
+[![Build Status](https://travis-ci.org/adamml/sdnUrnUrlResolver.svg?branch=master)](https://travis-ci.org/adamml/sdnUrnUrlResolver)
+
 ## Package ie.marine.data.seaDataNetUrnUrl`
 
 ### Example Usage
