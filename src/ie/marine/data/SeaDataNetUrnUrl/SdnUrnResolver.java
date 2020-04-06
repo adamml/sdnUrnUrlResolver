@@ -1,6 +1,6 @@
-package ie.marine.data.seaDataNetUrnUrl;
+package ie.marine.data.SeaDataNetUrnUrl;
 
-public interface sdnUrnResolver {
+public interface SdnUrnResolver {
 /**
  * Defines the SeaDataNet URN prefix and the catalogue names
  * 
@@ -54,7 +54,15 @@ public interface sdnUrnResolver {
 		/**
 		 * Base URL for the European Directory of Marine Research Projects SPARQL endpoint
 		 */
-		EDMERP("https://edmo.seadatanet.org/sparql/");
+		EDMERP("https://edmerp.seadatanet.org/sparql/"),
+		/**
+		 * Base URL for the NERC Vocabulary Server SPARQL endpoint
+		 */
+		VOCAB("http://vocab.nerc.ac.uk/sparql/"),
+		/**
+		 * Base URL for a SKOS collection in the NERC Vocabulary Server
+		 */
+		VOCABCOLLECTION("http://vocab.nerc.ac.uk/collection/");
 		
 		private String url;
 		baseUrls(final String url){this.url = url;}
@@ -70,11 +78,11 @@ public interface sdnUrnResolver {
 		EDMO(""),
 		CSR(""),
 		EDMERP(""),
-		VOCAB(""),
+		VOCAB("PREFIX skos:<http://www.w3.org/2004/02/skos/core#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?s WHERE {?s rdf:type skos:Collection}"),
 		/**
 		 * SPARQL Query webservice term for query parameter
 		 */
-		BASEQUERY("query="),
+		BASEQUERY("sparql?query="),
 		/**
 		 * SPARQL Query output format declaration
 		 */
@@ -85,5 +93,5 @@ public interface sdnUrnResolver {
 		public String getQuery() {return query;}
 	}
 	
-	public String getUrlFromUrn(String urn);
+	public String getUrlFromUrn(String urn) throws NotASeaDataNetURNException;
 }
