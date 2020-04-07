@@ -74,11 +74,42 @@ public interface SdnUrnResolver {
 	}
 	
 	public enum queries {
+		/**
+		 * RDF Prefixes for use in the SPARQL queries
+		 */
+		PREFIX("PREFIX skos:<http://www.w3.org/2004/02/skos/core#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"),
 		EDMED(""),
-		EDMO(""),
+		EDMEDRECORD(""),
+		/**
+		 * SPARQL query to give all European Directory of Marine Organisations entries
+		 */
+		EDMO("SELECT DISTINCT ?s ?p WHERE {?s rdf:type <http://www.w3.org/ns/org#Organization>. ?s skos:prefLabel ?p} ORDER By ?p"),
+		/**
+		 * SPARQL query for all detail for an individual record in the European Directory of Marine Organisations
+		 */
+		EDMORECORD("SELECT ?s ?o ?p WHERE {{BIND (<http://edmo.seadatanet.org/%s> AS ?s)?s ?o ?p} UNION {BIND (<http://edmo.seadatanet.org/%s> as ?org) ?org <http://www.w3.org/ns/org#hasSite> ?site. ?site <http://www.w3.org/ns/org#siteAddress> ?s. ?s ?o ?p} UNION { BIND (<http://edmo.seadatanet.org/%s> as ?org) ?org <http://www.w3.org/ns/org#hasSite> ?site. ?site <http://www.w3.org/ns/org#siteAddress> ?a. ?a <http://www.w3.org/2006/vcard/ns#hasGeo> ?s. ?s ?o ?p} UNION { BIND (<http://edmo.seadatanet.org/%s> as ?org) ?org <http://www.w3.org/ns/org#hasSite> ?site. ?site <http://www.w3.org/ns/org#siteAddress> ?a. ?a <http://www.w3.org/2006/vcard/ns#hasTelephone> ?s. ?s ?o ?p }}"),
 		CSR(""),
-		EDMERP(""),
-		VOCAB("PREFIX skos:<http://www.w3.org/2004/02/skos/core#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?s WHERE {?s rdf:type skos:Collection}"),
+		CSRECORD(""),
+		/**
+		 * SPARQL query to give all European Directory of Marine Research Projects entries
+		 */
+		EDMERP("SELECT ?s ?o WHERE {?s rdf:type <http://dbpedia.org/ontology/ResearchProject>. ?s <http://www.w3.org/2000/01/rdf-schema#label> ?o}"),
+		/**
+		 * SPARQL query to give all details for an individual record in the European Directory of Marine Research Projects
+		 */
+		EDMERPRECORD("SELECT ?s ?p ?o where {BIND(<http://edmerp.seadatanet.org/report/%s> AS ?s) ?s ?p ?o}"),
+		/**
+		 * SPARQL query to give a list of all SKOS Collections on the NERC Vocabulary Server
+		 */
+		VOCAB("SELECT ?s WHERE {?s rdf:type skos:Collection}"),
+		/**
+		 * SPARQL query to give all details for a SKOS collection on the NERC Vocabulary Server
+		 */
+		VOCABCOLLN("SELECT DISTINCT ?s ?o ?p WHERE {{BIND (<http://vocab.nerc.ac.uk/collection/%s/current/> as ?s) ?s rdf:type skos:Collection. ?s  ?o ?p} UNION {BIND (<http://vocab.nerc.ac.uk/collection/%s/current/> as ?a) BIND (skos:prefLabel as ?o) ?a skos:member ?s.?s ?o ?p}}"),
+		/**
+		 * SPARQL query to give all details for a SKOS Concept on the NERC Vocabulary Server
+		 */
+		VOCABCONCEPT("SELECT ?s ?o ?p WHERE {BIND (<http://vocab.nerc.ac.uk/collection/%s/current/%s/> as ?s) ?s rdf:type skos:Concept. ?s ?o ?p}"),
 		/**
 		 * SPARQL Query webservice term for query parameter
 		 */
@@ -90,6 +121,11 @@ public interface SdnUrnResolver {
 		
 		private String query;
 		queries(final String query){this.query = query;}
+		/**
+		 * Get a SPARQL query value
+		 * 
+		 * @return A string of the specified query
+		 */
 		public String getQuery() {return query;}
 	}
 	

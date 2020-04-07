@@ -25,7 +25,36 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
  * The list of valid vocabularies on the NERC Vocabulary Server
  */
 	private String nvsVocabs;
-// Method to encode a string value using `UTF-8` encoding scheme
+/**
+ * @return the entryID
+ */
+	private String getEntryID() {
+		return entryID;
+	}
+/**
+ * @param entryID the entryID to set
+ */
+	private void setEntryID(String entryID) {
+		this.entryID = entryID;
+	}
+/**
+ * @return the entryVersionID
+ */
+	private String getEntryVersionID() {
+		return entryVersionID;
+	}
+/**
+ * @param entryVersionID the entryVersionID to set
+ */
+	private void setEntryVersionID(String entryVersionID) {
+		this.entryVersionID = entryVersionID;
+	}
+/**
+ * Method to encode a string value using UTF-8 encoding scheme
+ * 
+ * @param value String to be encoded
+ * @return UTF-8 encoded String
+ */
     private static String encodeValue(String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
@@ -52,30 +81,83 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
  * 	
  * @param 	catalogue	String of the catalogue name to build the URL for
  * @return	String of the URL the URN resolves to
+ * @throws NotASeaDataNetURNException 
  */
-	private static String chooseCatalogue(String catalogue) {
-		switch(sdn.valueOf(catalogue)) {
-			case EDMED:
-				return baseUrls.EDMED.getUrl() 
-						+ queries.BASEQUERY.getQuery()
-						+ queries.EDMED.getQuery()
-						+ "&" + queries.OUTPUT.getQuery();
-			case CSR:
-				return baseUrls.CSR.getUrl() 
-						+ queries.BASEQUERY.getQuery()
-						+ "&" + queries.OUTPUT.getQuery();
-			case EDMO:
-				return baseUrls.EDMO.getUrl() 
-						+ queries.BASEQUERY.getQuery()
-						+ "&" + queries.OUTPUT.getQuery();
-			case EDMERP:
-				return baseUrls.EDMERP.getUrl() 
-						+ queries.BASEQUERY.getQuery()
-						+ "&" + queries.OUTPUT.getQuery();
-			default:
-				break;
+	private String chooseCatalogue(String catalogue) throws NotASeaDataNetURNException {
+		try {
+			switch(sdn.valueOf(catalogue)) {
+				case EDMED:
+					return baseUrls.EDMED.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ")
+							+ queries.EDMED.getQuery()
+							+ "&" + queries.OUTPUT.getQuery();
+				case CSR:
+					return baseUrls.CSR.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ")
+							+ "&" + queries.OUTPUT.getQuery();
+				case EDMO:
+					if(getEntryID() == null) {
+						return baseUrls.EDMO.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ")
+							+ encodeValue(queries.EDMO.getQuery())
+							+ "&" + queries.OUTPUT.getQuery();
+					} else {
+						return baseUrls.EDMO.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ")
+							+ encodeValue(String.format(queries.EDMORECORD.getQuery(),getEntryID(),getEntryID(),getEntryID(),getEntryID()))
+							+ "&" + queries.OUTPUT.getQuery();
+					}
+				case EDMERP:
+					if(getEntryID() == null) {
+						return baseUrls.EDMERP.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ")
+							+ encodeValue(queries.EDMERP.getQuery())
+							+ "&" + queries.OUTPUT.getQuery();
+					} else {
+						return baseUrls.EDMERP.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ")
+							+ encodeValue(String.format(queries.EDMERPRECORD.getQuery(),getEntryID()))
+							+ "&" + queries.OUTPUT.getQuery();
+					}
+				default:
+					return "";
+			}} catch (Exception e) {
+				if(getNvsVocabs().indexOf(catalogue) < 0) {
+					throw new NotASeaDataNetURNException();
+				} else {
+					if(getEntryVersionID() == null) {
+						setEntryVersionID("current");
+					}
+					if(getEntryID() == null) {
+						return baseUrls.VOCAB.getUrl() 
+								+ queries.BASEQUERY.getQuery()
+								+ encodeValue(queries.PREFIX.getQuery() + " ")
+								+ encodeValue(String.format(queries.VOCABCOLLN.getQuery(),catalogue,catalogue))
+								+ "&" + queries.OUTPUT.getQuery();
+					} else {
+						return baseUrls.VOCAB.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ")
+							+ encodeValue(String.format(queries.VOCABCONCEPT.getQuery(),catalogue,getEntryID()))
+							+ "&" + queries.OUTPUT.getQuery();
+					}
+				}
+			}
+	}
+	private String getListOfNvsCollectionsFromJSONString(String JSON) {
+		String returnVal = "";
+		while(JSON.indexOf(baseUrls.VOCABCOLLECTION.getUrl()) > 0) {
+			
+			JSON = JSON.substring(JSON.indexOf(baseUrls.VOCABCOLLECTION.getUrl()) + baseUrls.VOCABCOLLECTION.getUrl().length());
+			returnVal = returnVal + JSON.substring(0,JSON.indexOf("/")) + " ";
 		}
-		return "";
+		return returnVal;
 	}
 /**
  * Gets the current list of collections from the NERC Vocabulary Server
@@ -87,6 +169,7 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
 		StringBuilder content = new StringBuilder();
 			URL url = new URL(baseUrls.VOCAB.getUrl() + 
 					queries.BASEQUERY.getQuery() + 
+					encodeValue(queries.PREFIX.getQuery() + " ") +
 					encodeValue(queries.VOCAB.getQuery()) + 
 					"&" + queries.OUTPUT.getQuery());
 			URLConnection urlConn = url.openConnection();
@@ -118,7 +201,7 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
 	
 	public SeaDataNetUrnUrl() throws CannotReadFromNercVocabularyServerException {
 		try {
-			setNvsVocabs(getNVSCollections());
+			setNvsVocabs(getListOfNvsCollectionsFromJSONString(getNVSCollections()));
 		} catch (Exception e) {
 			throw new CannotReadFromNercVocabularyServerException();
 		}
@@ -132,6 +215,18 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
  */
 	public String getUrlFromUrn(String urn) throws NotASeaDataNetURNException {
 		String[] splitUrn = urn.split(":");
+		if(splitUrn.length < 2 || splitUrn.length > 4) {
+			throw new NotASeaDataNetURNException();
+		} else if (splitUrn.length == 2) {
+			setEntryVersionID(null);
+			setEntryID(null);
+		} else if (splitUrn.length == 3) {
+			setEntryVersionID(splitUrn[2]);
+			setEntryID(null);
+		} else {
+			setEntryVersionID(splitUrn[2]);
+			setEntryID(splitUrn[3]);
+		}
 		if(checkUrnPrefix(splitUrn[0])) {
 			return chooseCatalogue(splitUrn[1]);
 		} else {

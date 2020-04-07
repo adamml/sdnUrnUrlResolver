@@ -1,6 +1,8 @@
-# `Class: NotASeaDataNetURNException`
+# Class: NotASeaDataNetURNException
 
-## `public class NotASeaDataNetURNException extends Exception`
+## Package ie.marine.data.SeaDataNetUrnUrl
+
+## public class NotASeaDataNetURNException extends Exception
 
 Defines an Exception to throw if the URN encountered is not from the SeaDataNet namespace
 
