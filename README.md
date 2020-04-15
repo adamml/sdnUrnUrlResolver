@@ -9,8 +9,14 @@ A number of SPARQL queries are defined in the `SdnUrnUrlResolver` Interface, wit
 
 ### Example Usage
 ```java
-SeaDataNetUrnUrl sdnu = new SeaDataNetUrnUrl();
-String url = sdnu.getUrlFromUrn("SDN:EDMO::575");
+import ie.marine.data.seadatanet.urn.resolver.*;
+
+public class run {
+	public static void main(String[] args) throws NotASeaDataNetURNException, CannotReadFromNercVocabularyServerException {
+		SeaDataNetUrnUrl sdnu = new SeaDataNetUrnUrl();
+		System.out.println(sdnu.getUrlFromUrn("SDN:EDMED::4565"));
+	}
+}
 ```
 
 ### Class documentation
