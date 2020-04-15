@@ -3,5 +3,4 @@ language: java
 script: "mvn cobertura:cobertura"
 
 after_success:
-  - mvn coveralls:report
   - bash <(curl -s https://codecov.io/bash)
