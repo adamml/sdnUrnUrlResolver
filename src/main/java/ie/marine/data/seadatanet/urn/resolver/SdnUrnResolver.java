@@ -1,4 +1,4 @@
-package ie.marine.data.SeaDataNetUrnUrl;
+package ie.marine.data.seadatanet.urn.resolver;
 
 public interface SdnUrnResolver {
 /**
@@ -8,6 +8,7 @@ public interface SdnUrnResolver {
  * since 0.1
  *
  */
+	
 	public enum sdn{
 		/**
 		 * SeaDataNet URN prefix
@@ -44,6 +45,10 @@ public interface SdnUrnResolver {
 		 */
 		EDMED("https://edmed.seadatanet.org/sparql/"),
 		/**
+		 * Base URL for an EDMED record
+		 */
+		EDMEDRECORD("https://www.bodc.ac.uk/resources/inventories/edmed/report/%s/"),
+		/**
 		 * Base URL for the European Directory of Marine Organisations SPARQL endpoint
 		 */
 		EDMO("https://edmo.seadatanet.org/sparql/"),
@@ -78,8 +83,14 @@ public interface SdnUrnResolver {
 		 * RDF Prefixes for use in the SPARQL queries
 		 */
 		PREFIX("PREFIX skos:<http://www.w3.org/2004/02/skos/core#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"),
-		EDMED(""),
-		EDMEDRECORD(""),
+		/**
+		 * SPARQL query to give a full list of EDMED records available
+		 */
+		EDMED("select ?EDMEDRecord ?Title where {?EDMEDRecord a <http://www.w3.org/ns/dcat#Dataset> ; <http://purl.org/dc/terms/title> ?Title .} "),
+		/**
+		 * SPARQL Query to give an individual EDMED record
+		 */
+		EDMEDRECORD("SELECT DISTINCT ?s ?p ?o WHERE {{BIND(<%s> AS ?s). ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/prov#wasUsedBy> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/prov#qualifiedAttribution> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/prov#qualifiedAttribution> ?sss. ?sss <http://www.w3.org/ns/prov#agent> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/dcat#distribution> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://purl.org/dc/terms/spatial> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://purl.org/dc/terms/temporal> ?s. ?s ?p ?o } UNION {BIND(<%s> AS ?ss).?ss <http://www.w3.org/ns/prov#generated> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/prov#wasUsedBy> ?oo. ?oo <http://www.w3.org/ns/prov#generated> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/prov#wasUsedBy> ?oo. ?oo <http://www.w3.org/ns/prov#generated> ?ooo. ?ooo <http://www.w3.org/ns/prov#qualifiedAssociation> ?s. ?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/prov#wasUsedBy> ?oo. ?oo <http://www.w3.org/ns/prov#generated> ?ooo. ?ooo <http://www.w3.org/ns/prov#qualifiedAssociation> ?oooo. ?oooo <http://www.w3.org/ns/prov#hadPlan> ?s.?s ?p ?o} UNION {BIND(<%s> AS ?ss). ?ss <http://www.w3.org/ns/prov#wasUsedBy> ?oo. ?oo <http://www.w3.org/ns/prov#generated> ?ooo. ?ooo <http://www.w3.org/ns/prov#qualifiedAssociation> ?oooo. ?oooo <http://www.w3.org/ns/prov#hadPlan> ?ooooo. ?ooooo <http://www.w3.org/ns/prov#wasDerivedFrom> ?s. ?s ?p ?o}}"),
 		/**
 		 * SPARQL query to give all European Directory of Marine Organisations entries
 		 */

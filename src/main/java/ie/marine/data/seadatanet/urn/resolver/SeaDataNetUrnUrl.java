@@ -1,8 +1,9 @@
-package ie.marine.data.SeaDataNetUrnUrl;
+package ie.marine.data.seadatanet.urn.resolver;
 
 import java.net.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 /**
  * This class resolves a SeaDataNet URN to a URL
@@ -25,6 +26,10 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
  * The list of valid vocabularies on the NERC Vocabulary Server
  */
 	private String nvsVocabs;
+/**
+ * Add a logger
+ */
+	private final static Logger LOGGER = Logger.getLogger(SeaDataNetUrnUrl.class.getName());
 /**
  * @return the entryID
  */
@@ -79,74 +84,76 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
 /**
  * Select the SeaDataNet catalogue and build the URN from the URL
  * 	
+ * @param 	urn			String of the SeaDataNet URN to be resolved
  * @param 	catalogue	String of the catalogue name to build the URL for
  * @return	String of the URL the URN resolves to
- * @throws NotASeaDataNetURNException 
+ * @throws NotASeaDataNetURNException If the URN does not match the SeaDataNet pattern
  */
-	private String chooseCatalogue(String catalogue) throws NotASeaDataNetURNException {
+	private String chooseCatalogue(String urn, String catalogue) throws NotASeaDataNetURNException {
+		String query;
 		try {
 			switch(sdn.valueOf(catalogue)) {
 				case EDMED:
-					return baseUrls.EDMED.getUrl() 
+					query = baseUrls.EDMED.getUrl() 
 							+ queries.BASEQUERY.getQuery()
-							+ encodeValue(queries.PREFIX.getQuery() + " ")
-							+ queries.EDMED.getQuery()
-							+ "&" + queries.OUTPUT.getQuery();
+							+ encodeValue(queries.PREFIX.getQuery() + " ");
+					if(getEntryID() == null) {
+						query = query + encodeValue(queries.EDMED.getQuery());
+					} else {
+						String EDMEDurl = String.format(baseUrls.EDMEDRECORD.getUrl(), getEntryID());
+						query = query + 
+								encodeValue(String.format(queries.EDMEDRECORD.getQuery(),EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl,EDMEDurl));
+					}
+					return query + "&" + queries.OUTPUT.getQuery();
 				case CSR:
 					return baseUrls.CSR.getUrl() 
 							+ queries.BASEQUERY.getQuery()
 							+ encodeValue(queries.PREFIX.getQuery() + " ")
 							+ "&" + queries.OUTPUT.getQuery();
 				case EDMO:
+					query = baseUrls.EDMO.getUrl()
+						+ queries.BASEQUERY.getQuery()
+						+ encodeValue(queries.PREFIX.getQuery() + " ");
 					if(getEntryID() == null) {
-						return baseUrls.EDMO.getUrl() 
-							+ queries.BASEQUERY.getQuery()
-							+ encodeValue(queries.PREFIX.getQuery() + " ")
-							+ encodeValue(queries.EDMO.getQuery())
-							+ "&" + queries.OUTPUT.getQuery();
+						query = query
+							+ encodeValue(queries.EDMO.getQuery());
 					} else {
-						return baseUrls.EDMO.getUrl() 
-							+ queries.BASEQUERY.getQuery()
-							+ encodeValue(queries.PREFIX.getQuery() + " ")
-							+ encodeValue(String.format(queries.EDMORECORD.getQuery(),getEntryID(),getEntryID(),getEntryID(),getEntryID()))
-							+ "&" + queries.OUTPUT.getQuery();
+						query = query
+							+ encodeValue(String.format(queries.EDMORECORD.getQuery(),getEntryID(),getEntryID(),getEntryID(),getEntryID()));
 					}
+					return query + "&" + queries.OUTPUT.getQuery();
 				case EDMERP:
+					query = baseUrls.EDMERP.getUrl() 
+							+ queries.BASEQUERY.getQuery()
+							+ encodeValue(queries.PREFIX.getQuery() + " ");
 					if(getEntryID() == null) {
-						return baseUrls.EDMERP.getUrl() 
-							+ queries.BASEQUERY.getQuery()
-							+ encodeValue(queries.PREFIX.getQuery() + " ")
-							+ encodeValue(queries.EDMERP.getQuery())
-							+ "&" + queries.OUTPUT.getQuery();
+						query = query
+							+ encodeValue(queries.EDMERP.getQuery());
 					} else {
-						return baseUrls.EDMERP.getUrl() 
-							+ queries.BASEQUERY.getQuery()
-							+ encodeValue(queries.PREFIX.getQuery() + " ")
-							+ encodeValue(String.format(queries.EDMERPRECORD.getQuery(),getEntryID()))
-							+ "&" + queries.OUTPUT.getQuery();
+						query = query
+							+ encodeValue(String.format(queries.EDMERPRECORD.getQuery(),getEntryID()));
 					}
+					return query + "&" + queries.OUTPUT.getQuery();
 				default:
-					return "";
+					throw new NotASeaDataNetURNException(urn);
 			}} catch (Exception e) {
 				if(getNvsVocabs().indexOf(catalogue) < 0) {
-					throw new NotASeaDataNetURNException();
+					throw new NotASeaDataNetURNException(urn);
 				} else {
 					if(getEntryVersionID() == null) {
 						setEntryVersionID("current");
 					}
-					if(getEntryID() == null) {
-						return baseUrls.VOCAB.getUrl() 
-								+ queries.BASEQUERY.getQuery()
-								+ encodeValue(queries.PREFIX.getQuery() + " ")
-								+ encodeValue(String.format(queries.VOCABCOLLN.getQuery(),catalogue,catalogue))
-								+ "&" + queries.OUTPUT.getQuery();
-					} else {
-						return baseUrls.VOCAB.getUrl() 
+					query = baseUrls.VOCAB.getUrl() 
 							+ queries.BASEQUERY.getQuery()
-							+ encodeValue(queries.PREFIX.getQuery() + " ")
-							+ encodeValue(String.format(queries.VOCABCONCEPT.getQuery(),catalogue,getEntryID()))
-							+ "&" + queries.OUTPUT.getQuery();
+							+ encodeValue(queries.PREFIX.getQuery() + " ");
+					if(getEntryID() == null) {
+						query = query
+								+ encodeValue(String.format(queries.VOCABCOLLN.getQuery(),catalogue,catalogue));
+					} else {
+						query = query
+							+ encodeValue(String.format(queries.VOCABCONCEPT.getQuery(),catalogue,getEntryID()));
 					}
+					return query + "&" + queries.OUTPUT.getQuery();
 				}
 			}
 	}
@@ -162,8 +169,8 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
 /**
  * Gets the current list of collections from the NERC Vocabulary Server
  * 	
- * @return
- * @throws IOException
+ * @return String containg the list of NERC Vocabulary Server Concept Collections
+ * @throws IOException If cannot read from  NERC Vocabulary Server
  */
 	private String getNVSCollections() throws IOException{
 		StringBuilder content = new StringBuilder();
@@ -211,12 +218,12 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
  * 
  * @param 	urn	String giving the URN to be resolved
  * @return 	String of the URL the URN resolves to
- * @throws NotASeaDataNetURNException 
+ * @throws NotASeaDataNetURNException If the URN does not meet the SeaDataNet patterns, an exception is thrown
  */
 	public String getUrlFromUrn(String urn) throws NotASeaDataNetURNException {
 		String[] splitUrn = urn.split(":");
 		if(splitUrn.length < 2 || splitUrn.length > 4) {
-			throw new NotASeaDataNetURNException();
+			throw new NotASeaDataNetURNException(urn);
 		} else if (splitUrn.length == 2) {
 			setEntryVersionID(null);
 			setEntryID(null);
@@ -228,9 +235,9 @@ public final class SeaDataNetUrnUrl implements SdnUrnResolver{
 			setEntryID(splitUrn[3]);
 		}
 		if(checkUrnPrefix(splitUrn[0])) {
-			return chooseCatalogue(splitUrn[1]);
+			return chooseCatalogue(urn,splitUrn[1]);
 		} else {
-			throw new NotASeaDataNetURNException();
+			throw new NotASeaDataNetURNException(urn);
 		}
 	}
 }

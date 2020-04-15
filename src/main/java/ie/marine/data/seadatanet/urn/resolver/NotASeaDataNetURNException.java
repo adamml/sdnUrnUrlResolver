@@ -1,4 +1,4 @@
-package ie.marine.data.SeaDataNetUrnUrl;
+package ie.marine.data.seadatanet.urn.resolver;
 /**
  * Defines an Exception to throw if the URN encountered is not from the SeaDataNet namespace
  * 
@@ -8,7 +8,7 @@ package ie.marine.data.SeaDataNetUrnUrl;
  */
 @SuppressWarnings("serial")
 public class NotASeaDataNetURNException extends Exception{
-	public NotASeaDataNetURNException() {
-		super("The URN provided is not a SeaDataNet URN...");
+	public NotASeaDataNetURNException(String sdnurn) {
+		super(String.format("The URN provided is not a SeaDataNet URN... [%s]",sdnurn));
 	}
 }

@@ -1,4 +1,4 @@
-package ie.marine.data.SeaDataNetUrnUrl;
+package ie.marine.data.seadatanet.urn.resolver;
 /**
  * Defines an Exception to throw if the NERC Vocabulary Server Cannot Be Accessed
  * 

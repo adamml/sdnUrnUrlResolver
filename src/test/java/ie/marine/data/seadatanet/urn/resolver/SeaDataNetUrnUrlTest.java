@@ -6,20 +6,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import ie.marine.data.SeaDataNetUrnUrl.NotASeaDataNetURNException;
-import ie.marine.data.SeaDataNetUrnUrl.SeaDataNetUrnUrl;
+import ie.marine.data.seadatanet.urn.resolver.NotASeaDataNetURNException;
+import ie.marine.data.seadatanet.urn.resolver.SeaDataNetUrnUrl;
 
 class SeaDataNetUrnUrlTest {
 	
 	@Test
-	void testGetEdmedUrl() throws NotASeaDataNetURNException {
+	void testGetAllEdmeds() throws NotASeaDataNetURNException {
 		try {
 			SeaDataNetUrnUrl sdnu = new SeaDataNetUrnUrl();
-			assertEquals("https://edmed.seadatanet.org/sparql/sparql?query=PREFIX+skos%3A%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E+PREFIX+rdf%3A%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E+&output=json", 
+			assertEquals("https://edmed.seadatanet.org/sparql/sparql?query=PREFIX+skos%3A%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E+PREFIX+rdf%3A%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E+select+%3FEDMEDRecord+%3FTitle+where+%7B%3FEDMEDRecord+a+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fdcat%23Dataset%3E+%3B+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2Ftitle%3E+%3FTitle+.%7D+&output=json", 
 				sdnu.getUrlFromUrn("SDN:EDMED"));
 		} catch (Exception e) {}
 	}
 
+	@Test
+	void testGetEdmedRecord() throws NotASeaDataNetURNException {
+		try {
+			SeaDataNetUrnUrl sdnu = new SeaDataNetUrnUrl();
+			assertEquals("https://edmed.seadatanet.org/sparql/sparql?query=PREFIX+skos%3A%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E+PREFIX+rdf%3A%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E+SELECT+DISTINCT+%3Fs+%3Fp+%3Fo+WHERE+%7B%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fs%29.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23wasUsedBy%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23qualifiedAttribution%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23qualifiedAttribution%3E+%3Fsss.+%3Fsss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23agent%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fdcat%23distribution%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2Fspatial%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2Ftemporal%3E+%3Fs.+%3Fs+%3Fp+%3Fo+%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23generated%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23wasUsedBy%3E+%3Foo.+%3Foo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23generated%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23wasUsedBy%3E+%3Foo.+%3Foo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23generated%3E+%3Fooo.+%3Fooo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23qualifiedAssociation%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23wasUsedBy%3E+%3Foo.+%3Foo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23generated%3E+%3Fooo.+%3Fooo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23qualifiedAssociation%3E+%3Foooo.+%3Foooo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23hadPlan%3E+%3Fs.%3Fs+%3Fp+%3Fo%7D+UNION+%7BBIND%28%3Chttps%3A%2F%2Fwww.bodc.ac.uk%2Fresources%2Finventories%2Fedmed%2Freport%2F4565%2F%3E+AS+%3Fss%29.+%3Fss+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23wasUsedBy%3E+%3Foo.+%3Foo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23generated%3E+%3Fooo.+%3Fooo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23qualifiedAssociation%3E+%3Foooo.+%3Foooo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23hadPlan%3E+%3Fooooo.+%3Fooooo+%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23wasDerivedFrom%3E+%3Fs.+%3Fs+%3Fp+%3Fo%7D%7D&output=json", 
+				sdnu.getUrlFromUrn("SDN:EDMED::4565"));
+		} catch (Exception e) {}
+	}
+	
 	@Test
 	void testGetEdmerpRecordUrl() throws NotASeaDataNetURNException {
 		try {
