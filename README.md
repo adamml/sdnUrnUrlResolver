@@ -14,7 +14,7 @@ String url = sdnu.getUrlFromUrn("SDN:EDMO::575");
 ```
 
 ### Class documentation
-JavaDoc documentation can be viewed here.
+JavaDoc documentation can be viewed [here](https://adamml.github.io/sdnUrnUrlResolver/).
 
 ### Unit tests
 Unit tests are written in JUnit 5 and can be executed via `maven test`.
