@@ -1,3 +1,4 @@
 language: java
 
-script "mvn cobertura:org.codehaus.mojo.cobertura"
+script:
+- "mvn cobertura:org.codehaus.mojo.cobertura"
